@@ -1,0 +1,677 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>1.使用NVIDIA_TAO工具包和Innotescus为迁移学习管理数据.md</title>
+<meta http-equiv="Content-type" content="text/html;charset=UTF-8">
+
+<style>
+/* https://github.com/microsoft/vscode/blob/master/extensions/markdown-language-features/media/markdown.css */
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+body {
+	font-family: var(--vscode-markdown-font-family, -apple-system, BlinkMacSystemFont, "Segoe WPC", "Segoe UI", "Ubuntu", "Droid Sans", sans-serif);
+	font-size: var(--vscode-markdown-font-size, 14px);
+	padding: 0 26px;
+	line-height: var(--vscode-markdown-line-height, 22px);
+	word-wrap: break-word;
+}
+
+#code-csp-warning {
+	position: fixed;
+	top: 0;
+	right: 0;
+	color: white;
+	margin: 16px;
+	text-align: center;
+	font-size: 12px;
+	font-family: sans-serif;
+	background-color:#444444;
+	cursor: pointer;
+	padding: 6px;
+	box-shadow: 1px 1px 1px rgba(0,0,0,.25);
+}
+
+#code-csp-warning:hover {
+	text-decoration: none;
+	background-color:#007acc;
+	box-shadow: 2px 2px 2px rgba(0,0,0,.25);
+}
+
+body.scrollBeyondLastLine {
+	margin-bottom: calc(100vh - 22px);
+}
+
+body.showEditorSelection .code-line {
+	position: relative;
+}
+
+body.showEditorSelection .code-active-line:before,
+body.showEditorSelection .code-line:hover:before {
+	content: "";
+	display: block;
+	position: absolute;
+	top: 0;
+	left: -12px;
+	height: 100%;
+}
+
+body.showEditorSelection li.code-active-line:before,
+body.showEditorSelection li.code-line:hover:before {
+	left: -30px;
+}
+
+.vscode-light.showEditorSelection .code-active-line:before {
+	border-left: 3px solid rgba(0, 0, 0, 0.15);
+}
+
+.vscode-light.showEditorSelection .code-line:hover:before {
+	border-left: 3px solid rgba(0, 0, 0, 0.40);
+}
+
+.vscode-light.showEditorSelection .code-line .code-line:hover:before {
+	border-left: none;
+}
+
+.vscode-dark.showEditorSelection .code-active-line:before {
+	border-left: 3px solid rgba(255, 255, 255, 0.4);
+}
+
+.vscode-dark.showEditorSelection .code-line:hover:before {
+	border-left: 3px solid rgba(255, 255, 255, 0.60);
+}
+
+.vscode-dark.showEditorSelection .code-line .code-line:hover:before {
+	border-left: none;
+}
+
+.vscode-high-contrast.showEditorSelection .code-active-line:before {
+	border-left: 3px solid rgba(255, 160, 0, 0.7);
+}
+
+.vscode-high-contrast.showEditorSelection .code-line:hover:before {
+	border-left: 3px solid rgba(255, 160, 0, 1);
+}
+
+.vscode-high-contrast.showEditorSelection .code-line .code-line:hover:before {
+	border-left: none;
+}
+
+img {
+	max-width: 100%;
+	max-height: 100%;
+}
+
+a {
+	text-decoration: none;
+}
+
+a:hover {
+	text-decoration: underline;
+}
+
+a:focus,
+input:focus,
+select:focus,
+textarea:focus {
+	outline: 1px solid -webkit-focus-ring-color;
+	outline-offset: -1px;
+}
+
+hr {
+	border: 0;
+	height: 2px;
+	border-bottom: 2px solid;
+}
+
+h1 {
+	padding-bottom: 0.3em;
+	line-height: 1.2;
+	border-bottom-width: 1px;
+	border-bottom-style: solid;
+}
+
+h1, h2, h3 {
+	font-weight: normal;
+}
+
+table {
+	border-collapse: collapse;
+}
+
+table > thead > tr > th {
+	text-align: left;
+	border-bottom: 1px solid;
+}
+
+table > thead > tr > th,
+table > thead > tr > td,
+table > tbody > tr > th,
+table > tbody > tr > td {
+	padding: 5px 10px;
+}
+
+table > tbody > tr + tr > td {
+	border-top: 1px solid;
+}
+
+blockquote {
+	margin: 0 7px 0 5px;
+	padding: 0 16px 0 10px;
+	border-left-width: 5px;
+	border-left-style: solid;
+}
+
+code {
+	font-family: Menlo, Monaco, Consolas, "Droid Sans Mono", "Courier New", monospace, "Droid Sans Fallback";
+	font-size: 1em;
+	line-height: 1.357em;
+}
+
+body.wordWrap pre {
+	white-space: pre-wrap;
+}
+
+pre:not(.hljs),
+pre.hljs code > div {
+	padding: 16px;
+	border-radius: 3px;
+	overflow: auto;
+}
+
+pre code {
+	color: var(--vscode-editor-foreground);
+	tab-size: 4;
+}
+
+/** Theming */
+
+.vscode-light pre {
+	background-color: rgba(220, 220, 220, 0.4);
+}
+
+.vscode-dark pre {
+	background-color: rgba(10, 10, 10, 0.4);
+}
+
+.vscode-high-contrast pre {
+	background-color: rgb(0, 0, 0);
+}
+
+.vscode-high-contrast h1 {
+	border-color: rgb(0, 0, 0);
+}
+
+.vscode-light table > thead > tr > th {
+	border-color: rgba(0, 0, 0, 0.69);
+}
+
+.vscode-dark table > thead > tr > th {
+	border-color: rgba(255, 255, 255, 0.69);
+}
+
+.vscode-light h1,
+.vscode-light hr,
+.vscode-light table > tbody > tr + tr > td {
+	border-color: rgba(0, 0, 0, 0.18);
+}
+
+.vscode-dark h1,
+.vscode-dark hr,
+.vscode-dark table > tbody > tr + tr > td {
+	border-color: rgba(255, 255, 255, 0.18);
+}
+
+</style>
+
+<style>
+/* Tomorrow Theme */
+/* http://jmblog.github.com/color-themes-for-google-code-highlightjs */
+/* Original theme - https://github.com/chriskempson/tomorrow-theme */
+
+/* Tomorrow Comment */
+.hljs-comment,
+.hljs-quote {
+	color: #8e908c;
+}
+
+/* Tomorrow Red */
+.hljs-variable,
+.hljs-template-variable,
+.hljs-tag,
+.hljs-name,
+.hljs-selector-id,
+.hljs-selector-class,
+.hljs-regexp,
+.hljs-deletion {
+	color: #c82829;
+}
+
+/* Tomorrow Orange */
+.hljs-number,
+.hljs-built_in,
+.hljs-builtin-name,
+.hljs-literal,
+.hljs-type,
+.hljs-params,
+.hljs-meta,
+.hljs-link {
+	color: #f5871f;
+}
+
+/* Tomorrow Yellow */
+.hljs-attribute {
+	color: #eab700;
+}
+
+/* Tomorrow Green */
+.hljs-string,
+.hljs-symbol,
+.hljs-bullet,
+.hljs-addition {
+	color: #718c00;
+}
+
+/* Tomorrow Blue */
+.hljs-title,
+.hljs-section {
+	color: #4271ae;
+}
+
+/* Tomorrow Purple */
+.hljs-keyword,
+.hljs-selector-tag {
+	color: #8959a8;
+}
+
+.hljs {
+	display: block;
+	overflow-x: auto;
+	color: #4d4d4c;
+	padding: 0.5em;
+}
+
+.hljs-emphasis {
+	font-style: italic;
+}
+
+.hljs-strong {
+	font-weight: bold;
+}
+</style>
+
+<style>
+/*
+ * Markdown PDF CSS
+ */
+
+ body {
+	font-family: -apple-system, BlinkMacSystemFont, "Segoe WPC", "Segoe UI", "Ubuntu", "Droid Sans", sans-serif, "Meiryo";
+	padding: 0 12px;
+}
+
+pre {
+	background-color: #f8f8f8;
+	border: 1px solid #cccccc;
+	border-radius: 3px;
+	overflow-x: auto;
+	white-space: pre-wrap;
+	overflow-wrap: break-word;
+}
+
+pre:not(.hljs) {
+	padding: 23px;
+	line-height: 19px;
+}
+
+blockquote {
+	background: rgba(127, 127, 127, 0.1);
+	border-color: rgba(0, 122, 204, 0.5);
+}
+
+.emoji {
+	height: 1.4em;
+}
+
+code {
+	font-size: 14px;
+	line-height: 19px;
+}
+
+/* for inline code */
+:not(pre):not(.hljs) > code {
+	color: #C9AE75; /* Change the old color so it seems less like an error */
+	font-size: inherit;
+}
+
+/* Page Break : use <div class="page"/> to insert page break
+-------------------------------------------------------- */
+.page {
+	page-break-after: always;
+}
+
+</style>
+
+<script src="https://unpkg.com/mermaid/dist/mermaid.min.js"></script>
+</head>
+<body>
+  <script>
+    mermaid.initialize({
+      startOnLoad: true,
+      theme: document.body.classList.contains('vscode-dark') || document.body.classList.contains('vscode-high-contrast')
+          ? 'dark'
+          : 'default'
+    });
+  </script>
+<h1 id="%E4%BD%BF%E7%94%A8-nvidia-tao-%E5%B7%A5%E5%85%B7%E5%8C%85%E5%92%8C-innotescus-%E4%B8%BA%E8%BF%81%E7%A7%BB%E5%AD%A6%E4%B9%A0%E7%AE%A1%E7%90%86%E6%95%B0%E6%8D%AE">使用 NVIDIA TAO 工具包和 Innotescus 为迁移学习管理数据</h1>
+<p><img src="innotescus-featured.png" alt="innotescus-featured.png"></p>
+<p>AI 应用程序由机器学习模型提供支持，这些模型经过训练可以根据图像、文本或音频等输入数据准确预测结果。 从头开始训练机器学习模型需要大量数据和大量人类专业知识，对于大多数组织而言，该过程通常过于昂贵和耗时。</p>
+<p>迁移学习是从头开始构建自定义模型和选择现成的商业模型以集成到 ML 应用程序之间的媒介。 通过迁移学习，您可以选择与您的解决方案相关的预训练模型，并根据反映您的特定用例的数据对其进行重新训练。 迁移学习在定制一切方法（通常过于昂贵）和现成方法（通常过于僵化）之间取得了适当的平衡，使您能够以更少的资源构建定制的解决方案。</p>
+<p><a href="https://developer.nvidia.com/tao-toolkit">NVIDIA TAO </a>工具包使您能够将迁移学习应用于预训练模型并创建定制的、产品级的模型，而无需 AI 框架的复杂性。 要训练这些模型，高质量的数据是必须的。 TAO 专注于开发过程中以模型为中心的步骤，而 <code>Innotescus</code> 专注于以数据为中心的步骤。</p>
+<p><a href="https://innotescus.io/">Innotescus</a> 是一个基于 Web 的平台，用于注释、分析和管理稳健、无偏见的数据集，用于基于计算机视觉的机器学习。 <code>Innotescus</code> 帮助团队在不牺牲质量的情况下扩展运营。 该平台包括用于图像和视频的自动和辅助注释、用于 QA 流程的共识和审查功能，以及用于主动数据集分析和平衡的交互式分析。 <code>Innotescus</code> 和 TAO 工具包一起使组织能够在自定义应用程序中成功应用迁移学习，从而在短时间内获得高性能解决方案。</p>
+<p>在这篇文章中，我们通过将 <code>NVIDIA TAO</code> 工具包与 <code>Innotescus</code> 集成来解决构建稳健对象检测模型的挑战。 该解决方案缓解了企业在构建和部署商业解决方案时遇到的几个常见痛点。</p>
+<h2 id="yolo-object-detection-model">YOLO object detection model</h2>
+<p>您在此项目中的目标是使用 <code>Innotescus</code> 上整理的数据将迁移学习应用于 TAO 工具包中的 YOLO 目标检测模型。</p>
+<p>目标检测是利用图像或视频中的边界框对目标进行定位和分类的能力。 它是计算机视觉技术应用最广泛的一种。 目标检测解决了许多复杂的现实挑战，例如：</p>
+<ul>
+<li>上下文和场景理解</li>
+<li>智能零售自动化解决方案</li>
+<li>自动驾驶</li>
+<li>精准农业</li>
+</ul>
+<p>为什么要为这个模型使用 YOLO？传统上，基于深度学习的目标检测器通过两个阶段的过程进行操作。在第一阶段，模型识别图像中的感兴趣区域。在第二阶段，对这些区域中的每一个进行分类。</p>
+<p>通常，许多区域被发送到分类阶段，并且由于分类是一项昂贵的操作，两阶段目标检测器非常慢。 YOLO 代表“你只看一次 You only look once”。顾名思义，YOLO 可以同时进行本地化和分类，从而实现高度准确的实时性能，这对于大多数可部署的解决方案至关重要。 2020年4月，YOLO第四次迭代发布。它已经在众多应用和行业中进行了测试，并被证明是强大的。</p>
+<p>下图 显示了训练对象检测模型的一般流程。对于这个更传统的开发流程的每一步，我们都会讨论人们遇到的典型挑战以及 TAO 和 Innotescus 的结合如何解决这些问题。</p>
+<p><img src="ai-development-workflow.png" alt="ai-development-workflow.png"></p>
+<p>在开始之前，安装 TAO 工具包并验证您的 Innotescus API 实例。</p>
+<p><img src="tao-toolkit-stack-1024x540.jpg" alt="tao-toolkit-stack-1024x540.jpg"></p>
+<p>TAO 工具包可以作为 CLI 或 Jupyter Notebook 运行。 它只兼容 Python3（3.6.9 和 3.7），所以首先安装必须的工具。</p>
+<h2 id="%E5%AE%89%E8%A3%85docker-ce"><a href="https://docs.docker.com/engine/install/">安装docker-ce</a></h2>
+<ul>
+<li>在 Linux 上，<a href="https://docs.docker.com/engine/install/linux-postinstall/">检查安装后步骤</a>以确保 Docker 可以在没有 sudo 的情况下运行。</li>
+<li><a href="https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/install-guide.html">安装 nvidia-container-toolkit</a>。</li>
+<li>创建 <a href="https://catalog.ngc.nvidia.com/">NGC 帐户</a>并生成 API 密钥进行身份验证。</li>
+<li>通过运行命令 <code>docker login nvcr.io</code> 登录到 NGC Docker 注册表并输入您的凭据以进行身份验证。</li>
+</ul>
+<p>安装必备软件后，安装 TAO 工具包。 NVIDIA 建议使用 <a href="https://python-guide-cn.readthedocs.io/en/latest/dev/virtualenvs.html">virtualenvwrapper</a> 在虚拟环境中安装包。 要安装 TAO 启动器 Python 包，请运行以下命令：</p>
+<pre class="hljs"><code><div>pip3 install nvidia-pyindex
+pip3 install nvidia-tao
+</div></code></pre>
+<p>通过运行 <code>tao --help</code> 检查您是否已正确完成安装。</p>
+<h2 id="%E8%AE%BF%E9%97%AE-innotescus-api">访问 Innotescus API</h2>
+<p>Innotescus 可作为基于 Web 的应用程序访问，但您还将使用其 API 来演示如何以编程方式完成相同的任务。 首先，安装 Innotescus 库。</p>
+<pre class="hljs"><code><div>pip install innotescus
+</div></code></pre>
+<p>接下来，使用从平台检索到的 <code>client_id</code> 和 <code>client_secret</code> 值对 API 实例进行身份验证。</p>
+<p><img src="api-generation-retrieval.png" alt=""></p>
+<pre class="hljs"><code><div><span class="hljs-keyword">from</span> innotescus <span class="hljs-keyword">import</span> client_factory
+client = client_factory(client_id=’client_id’, client_secret=’client_secret’)
+</div></code></pre>
+<p>现在您已准备好通过 API 与平台进行交互，您将在接下来的流程的每个步骤中进行操作。</p>
+<h2 id="%E6%95%B0%E6%8D%AE%E6%94%B6%E9%9B%86">数据收集</h2>
+<p>您需要数据来训练模型。 虽然它经常被忽视，但数据收集可以说是开发过程中最重要的一步。 在收集数据时，您应该问自己几个问题：</p>
+<ul>
+<li>训练数据是否充分代表了每个感兴趣的对象？</li>
+<li>您是否考虑了您期望部署模型的所有场景？</li>
+<li>你有足够的数据来训练模型吗？</li>
+</ul>
+<p>您不能总是完全回答这些问题，但是制定一个全面的数据收集计划可以帮助您避免在开发过程的后续步骤中出现问题。 数据收集是一个耗时且昂贵的过程。 由于 TAO 提供的模型是经过预训练的，因此再训练的数据需求要小得多，从而在此阶段为组织节省了大量资源。</p>
+<p>对于本实验，您使用来自 <a href="https://cocodataset.org/#download">MS COCO Validation 2017</a> 数据集的图像和标注。 该数据集包含 80 个不同类别的 5,000 张图像，但您仅使用包含至少一个人的 2,685 张图像。</p>
+<pre class="hljs"><code><div>%matplotlib inline
+<span class="hljs-keyword">from</span> pycocotools.coco <span class="hljs-keyword">import</span> COCO
+<span class="hljs-keyword">import</span> matplotlib.pyplot <span class="hljs-keyword">as</span> plt
+
+dataDir=’Your Data Directory’
+dataType=’val2017’
+annFile=’{}/annotations/instances_{}.json’.format(dataDir,dataType)
+
+coco=COCO(annFile)
+
+catIds = coco.getCatIds(catNms=[‘person’]) <span class="hljs-comment"># only using ‘person’ category</span>
+imgIds = coco.getImgIds(catIds=catIds)
+
+<span class="hljs-keyword">for</span> num_imgs <span class="hljs-keyword">in</span> len(imgIds): 
+	img = coco.loadImgs(imgIds[num_imgs])[<span class="hljs-number">0</span>]
+	I = io.imread(img[‘coco_url’])
+</div></code></pre>
+<p><img src="dataset-image-collage.png" alt=""></p>
+<p>使用经过身份验证的 Innotescus 客户端实例，开始设置项目并上传以人为中心的数据集。</p>
+<pre class="hljs"><code><div><span class="hljs-comment">#create a new project</span>
+client.create_project(project_name)
+<span class="hljs-comment">#upload data to the new project</span>
+client.upload_data(project_name, dataset_name, file_paths, data_type, storage_type)
+</div></code></pre>
+<ul>
+<li>data_type: The type of data this dataset holds. Accepted values:
+<ul>
+<li>DataType.IMAGE</li>
+<li>DataType.VIDEO</li>
+</ul>
+</li>
+<li>storage_type: The source of the data. Accepted values:
+<ul>
+<li>StorageType.FILE_SYSTEM</li>
+<li>StorageType.URL</li>
+</ul>
+</li>
+</ul>
+<p>现在可以通过 Innotescus 用户界面访问该数据集。</p>
+<p><img src="gallery-view.png" alt=""></p>
+<h2 id="%E6%95%B0%E6%8D%AE%E7%AE%A1%E7%90%86">数据管理</h2>
+<p>现在您已经有了初始数据集，开始整理它以确保数据集平衡。 研究一再表明，该过程的这一阶段大约需要花费在机器学习项目上的 80% 的时间。</p>
+<p>使用 TAO 和 Innotescus，我们重点介绍了预注释和审查等技术，这些技术可以在此步骤中节省时间，而不会牺牲数据集的大小或质量。</p>
+<h2 id="pre-annotation">Pre-annotation</h2>
+<p>预注释使您能够使用模型生成的注释来消除准确标记 2,685 个图像子集所需的大量时间和手动工作。 您使用 YOLOv4（与您重新训练的模型相同）来生成预注释，以供注释者细化。</p>
+<p>因为预注释可以为您节省大量时间在注释任务的较简单组件上，您可以将注意力集中在模型尚无法处理的较难示例上。</p>
+<p>YOLOv4 包含在 TAO 工具包中，支持 k-means 聚类、训练、评估、推理、修剪和导出。 要使用该模型，首先必须创建一个 <a href="https://docs.nvidia.com/tao/tao-toolkit/text/object_detection/yolo_v4.html">YOLOv4 spec</a> 文件，该文件具有以下主要组件：</p>
+<ul>
+<li>yolov4_config</li>
+<li>training_config</li>
+<li>eval_config</li>
+<li>nms_config</li>
+<li>augmentation_config</li>
+<li>dataset_config</li>
+</ul>
+<p>spec 文件是一个 protobuf 文本（prototxt）消息，它的每个字段既可以是基本数据类型，也可以是嵌套消息。</p>
+<p>接下来，下载具有预训练权重的模型。 TAO Toolkit Docker 容器提供对预训练模型存储库的访问，这些模型在训练深度神经网络时是一个很好的起点。 由于这些模型托管在 NGC 目录中，因此您必须首先下载并安装 NGC CLI。 有关详细信息，请参阅 <a href="https://docs.nvidia.com/ngc/ngc-catalog-cli-user-guide/index.html%22">NGC 文档</a>。</p>
+<p>安装 CLI 后，您可以在 NGC 存储库中查看预训练计算机视觉模型列表，并下载预训练模型。</p>
+<pre class="hljs"><code><div>ngc registry model list nvidia/tao/pretrained_*
+ngc registry model download-version /path/to/model_on_NGC_repo/ -dest /path/to/model_download_dir/
+</div></code></pre>
+<p>下载模型并更新规范文件后，您现在可以通过运行推理子任务来生成预注释。</p>
+<pre class="hljs"><code><div>tao yolo_v4 inference [-h] -i /path/to/imgFolder/ -l /path/to/annotatedOutput/ -e /path/to/specFile.txt -m /path/to/model/ -k $KEY
+</div></code></pre>
+<p>推理子任务的输出是一系列KITTI格式的注解，保存在指定的输出目录中。 下图显示了这些注释的两个示例：
+<img src="example-annotations.jpg" alt=""></p>
+<p>通过基于 Web 的用户界面或使用 API 手动将预注释上传到 Innotescus 平台。 因为 KITTI 格式是 Innotescus 接受的众多格式之一，所以不需要预处理。</p>
+<p><img src="pre-annotation-upload-process.png" alt=""></p>
+<pre class="hljs"><code><div><span class="hljs-comment">#upload pre-annotations generated by YOLOv4</span>
+Response = client.upload_annotations(project_name, dataset_name, task_type, data_type, annotation_format, file_paths, task_name, task_description, overwrite_existing_annotations, pre_annotate)
+</div></code></pre>
+<ul>
+<li>project_name: The name of the project containing the affected dataset and task.</li>
+<li>dataset_name: The name of the dataset to which these annotations are to be applied.</li>
+<li>task_type: The type of annotation task being created with these annotations. Accepted values from the TaskType class:
+<ul>
+<li>CLASSIFICATION</li>
+<li>OBJECT_DETECTION</li>
+<li>SEGMENTATION</li>
+<li>INSTANCE_SEGMENTATION</li>
+</ul>
+</li>
+<li>data_type: The type of data to which the annotations correspond. Accepted values:
+<ul>
+<li>DataType.IMAGE
+*DataType.VIDEO</li>
+</ul>
+</li>
+<li>annotation_format: The format in which these annotations are stored. Accepted values from the AnnotationFormat class:
+<ul>
+<li>COCO</li>
+<li>KITTI</li>
+<li>MASKS_PER_CLASS</li>
+<li>PASCAL</li>
+<li>CSV</li>
+<li>MASKS_SEMANTIC</li>
+<li>MASKS_INSTANCE</li>
+<li>INNOTESCUS_JSON</li>
+<li>YOLO_DARKNET</li>
+<li>YOLO_KERAS</li>
+</ul>
+</li>
+<li>file_paths: A list of file paths containing the annotation files to upload.</li>
+<li>task_name: The name of the task to which these annotations belong; if the task does not exist, it is created and populated with these annotations.</li>
+<li>task_description: A description of the task being created, if the task does not exist yet.
+overwrite_existing_annotations: If the task already exists, this flag allows you to overwrite existing annotations.</li>
+<li>pre_annotate: Allows you to import annotations as pre-annotations.</li>
+</ul>
+<p>将预注释导入平台并保存大量初始注释工作后，进入 Innotescus 以进一步更正、优化和分析数据。</p>
+<h2 id="%E5%AE%A1%E6%9F%A5%E5%92%8C%E6%9B%B4%E6%AD%A3">审查和更正</h2>
+<p>成功导入预注释后，前往平台对预注释进行审查和更正。 虽然预训练模型节省了大量的注释时间，但它仍然不完美，需要一些人在循环中的交互来确保高质量的训练数据。 下图 显示了您可能进行的典型更正示例。</p>
+<p><img src="error-pre-annotations.png" alt=""></p>
+<p>除了第一次修复和提交预注释之外，Innotescus 还可以对图像和注释进行更集中的采样，以进行多阶段审查。 这使大型团队能够系统且有效地确保整个数据集的高质量。</p>
+<p><img src="innotescus-ui.png" alt=""></p>
+<h2 id="%E6%8E%A2%E7%B4%A2%E6%80%A7%E6%95%B0%E6%8D%AE%E5%88%86%E6%9E%90">探索性数据分析</h2>
+<p>探索性数据分析（EDA）是从多个统计角度调查和可视化数据集的过程，以全面了解数据中存在的潜在模式、异常和偏差。在深思熟虑地解决数据集包含的统计不平衡问题之前，这是一个有效且必要的步骤。</p>
+<p>Innotescus 提供预先计算的指标，用于理解数据和注释的类别、颜色、空间和复杂性分布，并使您能够在图像和注释元数据中添加自己的信息层，以将特定于应用程序的信息合并到分析中。</p>
+<p>以下是如何使用 Innotescus 的深度可视化来了解数据集中存在的一些模式和偏差。下面的散点图显示了图像熵的分布，它是图像中的平均信息或随机程度，在数据集中沿 x 轴。您可以看到清晰的模式，但您也可以发现异常，例如具有低熵或信息内容的图像。</p>
+<p><img src="dataset-graph-dive.png" alt=""></p>
+<p><img src="entropy-high.png" alt=""><img src="entropy-low.png" alt=""></p>
+<p>像这样的异常值引发了如何处理数据集中异常的问题。 识别异常使您能够提出一些关键问题：</p>
+<ul>
+<li>您是否希望模型在部署时遇到低熵输入？</li>
+<li>如果是这样，您是否需要在训练数据集中有更多这样的示例？</li>
+<li>如果不是，这些示例是否会对训练有害，是否应该从训练数据集中删除？</li>
+</ul>
+<p>在另一个示例中，查看每个注释的区域，相对于它所在的图像。</p>
+<p><img src="dive-chart-1.png" alt=""></p>
+<p><img src="variation-annotation-size-a.png" alt=""><img src="variation-annotation-size-b.png" alt=""></p>
+<p>在上图 中，这两个图像显示了数据集中注释大小的变化。 虽然有些注释会捕捉到占据大量图像的人物，但大多数会显示远离相机的人物。</p>
+<p>在这里，很大比例的注释在它们各自图像大小的 0% 到 10% 之间。 这意味着数据集偏向于小物体或远离相机的人。 然后，您是否需要训练数据中的更多示例，这些示例具有更大的注释来代表离相机更近的人？ 以这种方式了解数据分布有助于您开始考虑数据增强计划。</p>
+<p>使用 Innotescus，EDA 变得直观。 它为您提供了对数据集进行强大扩充并在开发过程早期消除偏见所需的信息。</p>
+<h2 id="%E4%BD%BF%E7%94%A8%E6%95%B0%E6%8D%AE%E9%9B%86%E6%89%A9%E5%85%85%E8%BF%9B%E8%A1%8C%E9%9B%86%E7%BE%A4%E5%86%8D%E5%B9%B3%E8%A1%A1">使用数据集扩充进行集群再平衡</h2>
+<p>集群再平衡增强背后的想法是强大的。在最近由 Andrew Ng 和 DeepLearning.AI 主办的以数据为中心的 AI 竞赛中，这项技术的性能提升了 21%。</p>
+<p>您为每个数据点（每个边界框注释）生成一个 N 维特征向量，并将所有数据点聚集在更高维空间中。当您对具有相似特征的对象进行聚类时，您可以扩充数据集以使每个聚类具有相同的表示。</p>
+<p>我们选择使用[red channel mean, green channel mean, blue channel mean, gray image std, gray image entropy, relative area]作为N维特征向量。这些指标是从 Innotescus 导出的，它会自动计算它们。您还可以使用预训练模型生成的嵌入来填充特征向量，这可以说是更健壮的。</p>
+<p>您使用 k=4 的 k-means 聚类作为聚类算法，并使用 UMAP 将维度减少到两个以进行可视化。以下代码示例生成显示 UMAP 图的图形，使用这四个集群进行颜色编码。</p>
+<pre class="hljs"><code><div><span class="hljs-keyword">import</span> umap
+<span class="hljs-keyword">from</span> sklearn.decomposition <span class="hljs-keyword">import</span> PCA
+<span class="hljs-keyword">from</span> sklearn.cluster <span class="hljs-keyword">import</span> KMeans
+
+<span class="hljs-comment"># k-means on the feature vector</span>
+kmeans = KMeans(n_clusters=<span class="hljs-number">4</span>, random_state=<span class="hljs-number">0</span>).fit(featureVector)
+
+<span class="hljs-comment"># UMAP for dim reduction and visualization</span>
+fit = umap.UMAP(n_neighbors=<span class="hljs-number">5</span>,
+		min_dist=<span class="hljs-number">0.2</span>,
+		n_components=<span class="hljs-number">2</span>,
+		metric=’manhattan’)
+
+u = fit.fit_transform(featureVector)
+
+<span class="hljs-comment"># Plot UMAP components</span>
+plt.scatter(u[:,<span class="hljs-number">0</span>], u[:,<span class="hljs-number">1</span>], c=(kmeans.labels_))
+plt.title(‘UMAP embedding of kmeans colours’)
+</div></code></pre>
+<p><img src="four-clusters-two-dimensions.png" alt=""></p>
+<p>当您查看每个集群中的对象数量时，您可以清楚地看到不平衡，这会告知您应该如何增加数据以进行再训练。 这四个聚类分别代表 854、1523、1481 和 830 张图像。 如果图像在多个集群中具有对象，则将集群中的该图像与其大部分对象分组以进行增强。</p>
+<pre class="hljs"><code><div>clusters = {}
+
+<span class="hljs-keyword">for</span> file, cluster <span class="hljs-keyword">in</span> zip(filename, kmeans.labels_):
+	<span class="hljs-keyword">if</span> cluster <span class="hljs-keyword">not</span> <span class="hljs-keyword">in</span> clusters.keys():
+		clusters[cluster] = []
+		clusters[cluster].append(file)
+	<span class="hljs-keyword">else</span>:
+		clusters[cluster].append(file)
+
+<span class="hljs-keyword">for</span> numCls <span class="hljs-keyword">in</span> range(<span class="hljs-number">0</span>, len(clusters)):
+	print(‘Cluster {}: {} objects, {} images’.format(numCls+<span class="hljs-number">1</span>, len(clusters[numCls]), len(list(set(clusters[numCls])))))
+</div></code></pre>
+<p>输出:</p>
+<pre class="hljs"><code><div>Cluster 1: 2234 objects, 854 images
+Cluster 2: 3490 objects, 1523 images
+Cluster 3: 3629 objects, 1481 images
+Cluster 4: 1588 objects, 830 images
+</div></code></pre>
+<p>定义好集群后，您可以使用 <a href="https://imgaug.readthedocs.io/en/latest/">imgaug</a> Python 库引入增强技术来增强训练数据：平移、图像亮度调整和比例增强。 您进行扩充，使每个集群包含 2,000 个图像，总共 8,000 个。 当您扩充图像时，imgaug 确保注释坐标也被适当地更改。</p>
+<pre class="hljs"><code><div><span class="hljs-keyword">import</span> imgaug <span class="hljs-keyword">as</span> ia
+<span class="hljs-keyword">import</span> imgaug.augmenters <span class="hljs-keyword">as</span> iaa
+
+<span class="hljs-comment"># augment images</span>
+seq = iaa.Sequential([
+	iaa.Multiply([<span class="hljs-number">1.1</span>, <span class="hljs-number">1.5</span>]), <span class="hljs-comment"># change brightness, doesn’t affect BBs</span>
+	iaa.Affine(
+		translate_px={“x”:<span class="hljs-number">60</span>, “y”:<span class="hljs-number">60</span>},
+		scale=(<span class="hljs-number">0.5</span>, <span class="hljs-number">0.8</span>)
+	) <span class="hljs-comment"># translate by 60px on x/y axes &amp; scale to 50-80%, includes BBs</span>
+])
+
+<span class="hljs-comment"># augment BBs and images</span>
+image_aug, bbs_aug = seq(image=I, bounding_boxes=boundingBoxes)
+</div></code></pre>
+<p>使用相同的 UMAP 可视化技术，增强数据点现在以红色显示，您会看到数据集现在更加平衡，因为它更类似于高斯分布。
+<img src="rebalanced-clusters.png" alt=""></p>
+<h2 id="%E6%A8%A1%E5%9E%8B%E8%AE%AD%E7%BB%83">模型训练</h2>
+<p>有了均衡的、高质量的训练数据，最后一步就是训练模型。</p>
+<h2 id="%E5%88%A9%E7%94%A8tao-toolkit%E5%AF%B9yolov4%E8%BF%9B%E8%A1%8C%E5%9C%A8%E8%AE%AD%E7%BB%83">利用TAO Toolkit对YOLOv4进行在训练</h2>
+<p>要开始重新训练模型，首先确保规范文件包含感兴趣的类，以及预训练模型和训练数据的正确目录路径。 更改 training_config 部分中的训练参数。 保留 30% 的增强数据集作为测试数据集，用于比较预训练模型和再训练模型的性能。</p>
+<pre class="hljs"><code><div>ttraining_config {
+	batch_size_per_gpu: 8
+	num_epochs: 80
+	enable_qat: false
+	checkpoint_interval: 10
+	learning_rate {
+		soft_start_cosine_annealing_schedule {
+			min_learning_rate: 1e-7
+			max_learning_rate: 1e-4
+			soft_start: 0.3
+		}
+	}
+	regularizer {
+		type: L1
+		weight: 3e-5
+	}
+	optimizer {
+		adam {
+			epsilon: 1e-7
+			beta1: 0.9
+			beta2: 0.999
+			amsgrad: false
+		}
+	}
+	pretrain_model_path: “path/to/model/model.hdf5”
+}
+</div></code></pre>
+<p>运行训练命令</p>
+<pre class="hljs"><code><div>tao yolo_v4 train -e /path/to/specFile.txt -r /path/to/result -k $KEY
+</div></code></pre>
+<p>结果
+如您所见，平均精度提高了 14.93%，比预训练模型的 mAP 提高了 21.37%：</p>
+<table>
+<thead>
+<tr>
+<th>Model</th>
+<th>mAP50</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Yolov4 pretrained model</td>
+<td>69.86%</td>
+</tr>
+<tr>
+<td>Yolov4 retrained model with cluster-rebalanced augmentation</td>
+<td>84.79%</td>
+</tr>
+</tbody>
+</table>
+<h2 id="%E6%80%BB%E7%BB%93">总结</h2>
+<p>使用 NVIDIA TAO Toolkit 进行预注释和模型训练，使用 Innotescus 进行数据细化、分析和管理，您将 YOLOv4 在人类上的平均精度提高了很多：超过 20%。 您不仅提高了所选课程的表现，而且您使用的时间和数据比没有迁移学习的显着优势时更少。</p>
+<p>迁移学习是在资源有限的环境中生成高性能、特定于应用程序的模型的好方法。 使用诸如 TAO 工具包和 Innotescus 之类的工具使其适用于各种规模和背景的团队。</p>
+<h2 id="%E8%87%AA%E5%B7%B1%E5%B0%9D%E8%AF%95">自己尝试</h2>
+<p>有兴趣使用 <a href="https://innotescus.io/">Innotescus</a> 来增强和优化您自己的数据集吗？ <a href="http://info.innotescus.io/nvidia-blog-lp">注册</a>免费试用。 <a href="https://catalog.ngc.nvidia.com/orgs/nvidia/resources/cv_samples">下载示例资源</a>，开始使用 TAO 工具包进行 AI 模型训练。</p>
+
+</body>
+</html>
