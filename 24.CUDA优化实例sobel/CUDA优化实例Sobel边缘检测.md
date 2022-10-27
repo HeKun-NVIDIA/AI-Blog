@@ -1,3 +1,4 @@
+#! https://zhuanlan.zhihu.com/p/553169728
 # CUDA实例系列四:利用GPU加速Sobel边缘检测
 
 先简单的介绍一下Sobel边缘检测:

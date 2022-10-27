@@ -1,3 +1,4 @@
+#! https://zhuanlan.zhihu.com/p/553899794
 # 利用GPU内存的预获取功能加速应用
 
 ![](CUDA-Blog-Image-1000x600-1.jpg)

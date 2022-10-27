@@ -1,3 +1,4 @@
+#! https://zhuanlan.zhihu.com/p/553169643
 # 边缘计算AI入门
 
 ![](Edge-AI-featured.png)

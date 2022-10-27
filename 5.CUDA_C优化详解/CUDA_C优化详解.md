@@ -1,3 +1,4 @@
+#! https://zhuanlan.zhihu.com/p/551695465
 # CUDA_C优化详解
 
 使用 CUDA 工具包从 NVIDIA GPU 获得最佳性能的编程指南。

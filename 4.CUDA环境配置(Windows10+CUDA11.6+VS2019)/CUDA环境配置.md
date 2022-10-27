@@ -1,3 +1,4 @@
+#! https://zhuanlan.zhihu.com/p/551695302
 # 最新CUDA环境配置(Win10 + CUDA 11.6 + VS2019)
 
 本篇博客根据NVIDIA 官方文档所述, 并根据自己实践得出. 供各位需要的朋友参考.

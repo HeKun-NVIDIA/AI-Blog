@@ -1,3 +1,4 @@
+#! https://zhuanlan.zhihu.com/p/552049443
 # CUDA 存储单元的适用条件
 
 CUDA 设备使用多个内存空间，这些空间具有不同的特征，反映了它们在 CUDA 应用程序中的不同用途。 这些内存空间包括global, local, shared, constant, texture, 和 registers，下图所示。
