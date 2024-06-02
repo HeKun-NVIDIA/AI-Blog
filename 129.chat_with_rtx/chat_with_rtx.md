@@ -1,3 +1,4 @@
+#! https://zhuanlan.zhihu.com/p/683494847
 # NVIDIA Chat With RTX安装使用教程
 
 世界各地每天有数百万人使用聊天机器人，由基于 NVIDIA GPU 的云服务器提供支持。 现在，这些突破性工具即将登陆由 NVIDIA RTX 提供支持的 Windows PC，以实现本地、快速、自定义的生成 AI。
@@ -404,21 +405,4 @@ python build.py -m chatglm3_6b_32k --model_dir D:\\chatglm3_6b_32k  --output_dir
 ![](36.png)
 
 OK, 到这里我们就完成了所有的任务~~
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
