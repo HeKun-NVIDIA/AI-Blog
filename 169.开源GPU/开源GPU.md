@@ -1,3 +1,4 @@
+#! https://zhuanlan.zhihu.com/p/710560676
 # NVIDIA 全面转向开源 GPU 内核模块
 
 ![](https://developer-blogs.nvidia.com/wp-content/uploads/2023/12/hpc-featured.jpg)

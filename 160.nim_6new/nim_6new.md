@@ -1,3 +1,4 @@
+#! https://zhuanlan.zhihu.com/p/703587327
 # NIM(NVIDIA Inference Microservice)最新模型实例
 
 得益于不断涌现的突破性基础模型，生成式 AI 正在彻底改变各行各业的几乎所有用例。这些模型能够理解背景和原因，从而生成高质量的内容和高精度答案。

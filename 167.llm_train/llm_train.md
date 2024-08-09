@@ -1,3 +1,4 @@
+#! https://zhuanlan.zhihu.com/p/703910212
 # 揭秘万亿参数大型语言模型的 AI 推理部署
 
 ![](https://developer-blogs.nvidia.com/wp-content/uploads/2024/05/inference-tech-blog-amazon-tensorrt-llm-featured.jpg)
